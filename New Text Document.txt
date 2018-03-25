@@ -1,0 +1,33 @@
+<?php
+function elapsedTime($time)
+{
+    date_default_timezone_set('UTC');
+    $given_time = new DateTime("@$time");
+    $current_time = new DateTime();
+    $diff = $given_time->diff($current_time);
+    $timemap = array('y' => 'year',
+                     'm' => 'month',
+                     'd' => 'day',
+                     'h' => 'hour',
+                     'i' => 'minute',
+                     's' => 'second');
+    $timefmt = array();
+
+    foreach ($timemap as $prop => $desc) {
+        if ($diff->$prop > 0) {
+            $timefmt[] = ($diff->$prop > 1)
+                ? "{$diff->$prop} {$desc}s"
+                : "{$diff->$prop} $desc";
+        }
+    }
+
+    return (!$timefmt)
+        ? 'just now'
+        : ((count($timefmt) > 1)
+            ? $diff->format(sprintf('%s and %s',
+                implode(', ', array_slice($timefmt, 0, -1)), end($timefmt)))
+            : end($timefmt))
+            . (($given_time < $current_time) ? ' ago' : ' later');
+}
+echo elapsedTime(strtotime('2018-03-25 11:40'));
+?>
